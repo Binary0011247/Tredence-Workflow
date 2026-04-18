@@ -111,6 +111,32 @@ src/features/workflow/
   types/
     workflow.ts          # domain types and API contracts
 ```
+Every technical choice was made deliberately to balance scalability, maintainability, and rapid development. Here are the most critical decisions and their rationale:
+1. State Management: Zustand over Redux or Context
+Problem: A workflow application has a complex, shared state (nodes, edges, selections) that updates frequently, especially during drag operations.
+Decision: I chose Zustand as the state management library.
+Rationale:
+Simplicity & Boilerplate: It provides the power of a centralized store like Redux but with a minimal, hook-based API that avoids extensive boilerplate (actions, reducers, dispatchers).
+Performance: Unlike React Context, which can trigger re-renders of all consumers on any state change, Zustand allows for selector-based subscriptions. Components only re-render when the specific slice of state they care about changes, which is crucial for a smooth UI in a drag-and-drop interface.
+Maintainability: Centralizing all state logic (adding/updating nodes, handling selections) into a single store makes the application's data flow predictable and easy to debug.
+2. API Layer: An Abstracted Module (workflowApi.ts)
+Problem: The frontend needs to communicate with a backend, but this backend could change in the future. Components should not be tightly coupled to the API implementation.
+Decision: I created a dedicated API module that abstracts all fetch calls and provides simple, typed functions (e.g., getAutomations(), runSimulation()).
+Rationale:
+Separation of Concerns: This decouples the UI components from the data-fetching logic. Components don't know or care how the data is fetched; they just call a function.
+Future-Proofing: If the real backend uses GraphQL, gRPC, or has different endpoint URLs, the only file that needs to be changed is workflowApi.ts. No UI components would need to be refactored, making the application highly maintainable.
+3. Component Architecture: A Single, Dynamic NodeConfigPanel
+Problem: Each of the five node types requires a different configuration form.
+Decision: I implemented a single NodeConfigPanel.tsx component that uses a switch statement (or object mapping) to dynamically render the correct form based on the selected node's type.
+Rationale:
+Scalability & DRY Principle: This approach is far more scalable than creating a separate panel component for each node type (e.g., TaskNodePanel.tsx, ApprovalNodePanel.tsx). Adding a new node type in the future only requires adding a new case to the switch, not creating an entirely new file and duplicating logic.
+Co-location of Logic: All form-related logic is located in one place, making it easier to manage and reason about.
+4. Validation Logic: Pre-Simulation in the Sandbox Panel
+Problem: The workflow graph must be valid before it can be executed.
+Decision: I chose to run all validation logic within the Sandbox Panel before the API call is made, rather than implementing real-time validation on the canvas itself.
+Rationale:
+Pragmatic Tradeoff: Real-time validation (e.g., showing red error badges on nodes as you build) offers a slightly better user experience but is significantly more complex to implement performantly, as it needs to run on every change.
+Effective & Focused: This approach provides the user with all necessary feedback at the most critical moment—right before they attempt to run the simulation. It prevents invalid data from ever being sent to the "backend" and was the most effective use of development time for a prototype.
 
 ### Design Principles Applied
 
