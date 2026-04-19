@@ -4,6 +4,15 @@ This repository contains a working prototype of an **HR Workflow Designer** buil
 
 The module enables an HR admin to visually design internal workflows (onboarding, approvals, automated steps), configure node-level behavior, validate graph structure, and run a simulation in a sandbox.
 
+### ➡️ **Live Interactive Demo**-> https://tredence-workflow.vercel.app/
+
+
+
+
+https://github.com/user-attachments/assets/f758c433-11c6-4228-bb74-5ff296a8253c
+
+
+
 ---
 
 ## 1) Problem Statement
